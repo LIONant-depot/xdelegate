@@ -2,8 +2,8 @@
 
 A lightweight, flexible delegate system for C++20 with no external dependencies. Ideal for event handling, callbacks, and observer patterns in your projects.
 
-Delegates and Events are a well stablish pattern on how to have multiple classes totalking to eachother without them knowing eachother's types. 
-This minimizes dependencies between the actual types and provides an easy to use and debug framework.
+Delegates and events represent a well-established design pattern that enables multiple classes to communicate seamlessly without needing to know each
+other's types. This approach reduces dependencies among the classes, fostering a framework that is both user-friendly and easy to debug.
 
 ## **Features**
 - **No Dependencies**: Pure C++20, no third-party libraries needed.
