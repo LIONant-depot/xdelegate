@@ -281,7 +281,6 @@ int main() {
 }
 ```
 
-
 ## **Best Practices**
 - Use **`thread_unsafe`** in single-threaded applications for better performance.
 - Use **`thread_safe`** in multi-threaded applications to avoid race conditions.
@@ -295,3 +294,157 @@ int main() {
 - **Thread Safety**: Using `thread_unsafe` in multi-threaded code causes data races.
 - **Signature Mismatch**: Ensure callback arguments match the delegate's template parameters.
 - **Blocking Callbacks**: Long-running callbacks in `thread_safe` can block other threads due to the mutex.
+
+# Going beyound the basics... Extended Examples
+
+## 1. One-to-Many Communication (Publisher-Subscribers)
+A single publisher notifies multiple subscribers using the delegate system.
+
+```cpp
+#include "xdelegate.h"
+#include <iostream>
+
+class Subscriber {
+public:
+    void OnEvent(int x) {
+        std::cout << "Subscriber " << id << " received: " << x << "\n";
+    }
+    int id;
+};
+
+class Publisher {
+public:
+    xdelegate::thread_unsafe<int> delegate;
+    void TriggerEvent(int value) {
+        delegate.NotifyAll(value);
+    }
+};
+
+int main() {
+    Publisher pub;
+    Subscriber sub1{1}, sub2{2};
+
+    pub.delegate.Register<&Subscriber::OnEvent>(sub1);
+    pub.delegate.Register<&Subscriber::OnEvent>(sub2);
+
+    pub.TriggerEvent(42);
+    // Output:
+    // Subscriber 1 received: 42
+    // Subscriber 2 received: 42
+
+    return 0;
+}
+```
+
+- **Description**: The `Publisher` uses a delegate to notify multiple `Subscriber` instances. Each subscriber registers its `OnEvent` method, and `NotifyAll` calls all registered callbacks.
+
+## 2. Parent-to-Child Communication
+A parent class notifies its children using a delegate.
+
+```cpp
+#include "xdelegate.h"
+#include <iostream>
+#include <vector>
+
+class Child {
+public:
+    void OnMessage(const std::string& msg) {
+        std::cout << "Child " << id << " received: " << msg << "\n";
+    }
+    int id;
+};
+
+class Parent {
+public:
+    xdelegate::thread_unsafe<const std::string&> delegate;
+    std::vector<Child> children;
+
+    void AddChild(Child child) {
+        children.push_back(child);
+        delegate.Register<&Child::OnMessage>(children.back());
+    }
+
+    void SendMessage(const std::string& msg) {
+        delegate.NotifyAll(msg);
+    }
+};
+
+int main() {
+    Parent parent;
+    parent.AddChild(Child{1});
+    parent.AddChild(Child{2});
+
+    parent.SendMessage("Hello, children!");
+    // Output:
+    // Child 1 received: Hello, children!
+    // Child 2 received: Hello, children!
+
+    return 0;
+}
+```
+
+- **Description**: The `Parent` maintains a list of `Child` objects and registers their `OnMessage` methods with the delegate. When `SendMessage` is called, all children receive the message.
+
+## 3. Bidirectional Many-to-Many Communication
+Subscribers can also send messages back to publishers using a second delegate.
+
+```cpp
+#include "xdelegate.h"
+#include <iostream>
+
+class Publisher {
+public:
+    void OnSubscriberMessage(int x) {
+        std::cout << "Publisher received from subscriber: " << x << "\n";
+    }
+    void TriggerEvent(int x, xdelegate::thread_unsafe<int>& delegate) {
+        delegate.NotifyAll(x);
+    }
+};
+
+class Subscriber {
+public:
+    void OnPublisherEvent(int x) {
+        std::cout << "Subscriber received from publisher: " << x << "\n";
+    }
+    void SendMessageToPublisher(int x, xdelegate::thread_unsafe<int>& delegate) {
+        delegate.NotifyAll(x);
+    }
+};
+
+class EventDispatcher {
+public:
+    xdelegate::thread_unsafe<int> publisherToSubscriberDelegate;
+    xdelegate::thread_unsafe<int> subscriberToPublisherDelegate;
+};
+
+int main() {
+    EventDispatcher dispatcher;
+    Publisher pub1, pub2;
+    Subscriber sub1, sub2;
+
+    // Register publishers to receive messages from subscribers
+    dispatcher.subscriberToPublisherDelegate.Register<&Publisher::OnSubscriberMessage>(pub1);
+    dispatcher.subscriberToPublisherDelegate.Register<&Publisher::OnSubscriberMessage>(pub2);
+
+    // Register subscribers to receive messages from publishers
+    dispatcher.publisherToSubscriberDelegate.Register<&Subscriber::OnPublisherEvent>(sub1);
+    dispatcher.publisherToSubscriberDelegate.Register<&Subscriber::OnPublisherEvent>(sub2);
+
+    // Publisher sends a message to subscribers
+    pub1.TriggerEvent(10, dispatcher.publisherToSubscriberDelegate);
+    // Output:
+    // Subscriber received from publisher: 10
+    // Subscriber received from publisher: 10
+
+    // Subscriber sends a message to publishers
+    sub1.SendMessageToPublisher(20, dispatcher.subscriberToPublisherDelegate);
+    // Output:
+    // Publisher received from subscriber: 20
+    // Publisher received from subscriber: 20
+
+    return 0;
+}
+```
+
+---
