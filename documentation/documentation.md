@@ -71,6 +71,20 @@ To create a delegate, specify the argument types that the callbacks will accept:
 - `xdelegate::thread_unsafe<int, double>` for callbacks taking an `int` and a `double`.
 - `xdelegate::thread_safe<std::string>` for callbacks taking a `std::string`.
 
+**NOTE:** Please note that if you pass instances of classes like ``std::string`` you will
+cause a copy of it... which is very bad. It is much better if you pass those objects as
+references. So for the std::string example this will be the superior example:
+
+- `xdelegate::thread_safe<std::string&>` for callbacks taking a `std::string`.
+
+You can farther improve this by actually passing it as a const.
+
+- `xdelegate::thread_safe<const std::string&>` for callbacks taking a readonly `std::string`.
+
+Finally since you do not know who is going to call it... you can generalize it even more by doing:
+
+- `xdelegate::thread_safe<const std::string_view>` for callbacks taking a readonly string (std::string, char*, etc...).
+
 ### **Registering Callbacks**
 Callbacks can be registered as member functions or free functions/lambdas.
 
