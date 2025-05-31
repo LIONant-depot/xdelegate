@@ -305,6 +305,8 @@ Going beyound the basics...
 
 ## **One-to-Many Communication**
 One-to-Many Communication (Publisher-Subscribers). A single publisher notifies multiple subscribers using the delegate system.
+<br>
+**Description**: The `Publisher` uses a delegate to notify multiple `Subscriber` instances. Each subscriber registers its `OnEvent` method, and `NotifyAll` calls all registered callbacks.
 
 ```cpp
 #include "xdelegate.h"
@@ -341,8 +343,6 @@ int main() {
     return 0;
 }
 ```
-
-- **Description**: The `Publisher` uses a delegate to notify multiple `Subscriber` instances. Each subscriber registers its `OnEvent` method, and `NotifyAll` calls all registered callbacks.
 
 ## **Parent-to-Child Communication**
 A parent class notifies its children using a delegate.
