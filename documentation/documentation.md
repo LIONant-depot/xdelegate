@@ -119,7 +119,7 @@ Register and invoke a member function callback.
 
 ```cpp
 #include <iostream>
-#include "xdelegate.hpp"
+#include "xdelegate.h"
 
 class MyClass {
 public:
@@ -143,7 +143,7 @@ Register and invoke a lambda callback.
 
 ```cpp
 #include <iostream>
-#include "xdelegate.hpp"
+#include "xdelegate.h"
 
 int main() {
     xdelegate::thread_unsafe<int> delegate;
@@ -161,7 +161,7 @@ Register a free function with a handle and remove it.
 
 ```cpp
 #include <iostream>
-#include "xdelegate.hpp"
+#include "xdelegate.h"
 
 void PrintValue(int x) {
     std::cout << "Free function: " << x << "\n";
@@ -182,7 +182,7 @@ Unlike classes lambdas don't have natural pointers so how could we free them?
 
 ```cpp
 #include <iostream>
-#include "xdelegate.hpp"
+#include "xdelegate.h"
 
 int main() {
     xdelegate::thread_unsafe<int> delegate;
@@ -216,7 +216,7 @@ Use a thread-safe delegate with multiple threads.
 ```cpp
 #include <iostream>
 #include <thread>
-#include "xdelegate.hpp"
+#include "xdelegate.h"
 
 class MyClass {
 public:
@@ -251,7 +251,7 @@ Combine member functions, free functions, and lambdas.
 
 ```cpp
 #include <iostream>
-#include "xdelegate.hpp"
+#include "xdelegate.h"
 
 class MyClass {
 public:

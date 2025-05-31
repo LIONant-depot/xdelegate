@@ -15,7 +15,7 @@ This minimizes dependencies between the actual types and provides an easy to use
 
 ## **Quick Example**
 ```cpp
-#include "xdelegate.hpp"
+#include "xdelegate.h"
 #include <iostream>
 
 class MyClass {
