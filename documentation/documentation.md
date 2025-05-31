@@ -169,14 +169,46 @@ void PrintValue(int x) {
 
 int main() {
     xdelegate::thread_unsafe<int> delegate;
-    void* handle = reinterpret_cast<void*>(0x1234);
-    delegate.Register<&PrintValue>(handle);
+    delegate.Register<&PrintValue>(&PrintValue);
     delegate.NotifyAll(5);  // Output: Free function: 5
-    delegate.RemoveDelegates(handle);
+    delegate.RemoveDelegates(&PrintValue);
     delegate.NotifyAll(10); // No output (callback removed)
     return 0;
 }
 ```
+
+### **Free Lambdas by using any pointer as a handle to free it!**
+Unlike classes lambdas don't have natural pointers so how could we free them?
+
+```cpp
+#include <iostream>
+#include "xdelegate.hpp"
+
+int main() {
+    xdelegate::thread_unsafe<int> delegate;
+
+    // Note we use the delegate pointer as the key which later on we can use
+    // to free our registered lambda. The pointer is never access so it is 
+    // perfectly safe... the only thing we use is the actual value as the key
+    // We could also use things like this as a handle for the delegate
+    // void* pHandle = reinterpret_cast<void*>(0x1234);
+    // delegate.Register<...>(pHandle) or even delegate.Register<...>(&pHandle)
+    delegate.Register<[](int x) {
+        std::cout << "Lambda called with: " << x << "\n";
+    }>(&delegate);
+
+    delegate.NotifyAll(100);
+    // Output: Lambda called with: 100
+
+    // Now we can remove the lambda delegate using the same key as we used
+    // when registered it
+    delegate.RemoveDelegates(&delegate);
+
+    delegate.NotifyAll(10); // No output (callback removed)
+    return 0;
+}
+```
+
 
 ### **Thread-Safe Delegate in Multi-Threaded Context**
 Use a thread-safe delegate with multiple threads.
