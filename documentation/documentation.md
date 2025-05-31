@@ -399,6 +399,7 @@ int main() {
 
 ## **Bidirectional Many-to-Many Communication**
 Subscribers can also send messages back to publishers using a second delegate.
+<br>
 **Description**: This example demonstrates a flexible, many-to-many communication system using the xdelegate library, where publishers and subscribers exchange messages
 via an EventDispatcher without needing to know each other’s types. The EventDispatcher manages two delegates—one for publishers to notify subscribers 
 and another for subscribers to notify publishers—enabling loose coupling. This design enhances flexibility and maintainability by allowing
