@@ -29,7 +29,7 @@ int main() {
 ```
 
 ## **Documentation**
-Dive into detailed guides and examples in the [full documentation](documentation/xdelegate.md).
+Dive into detailed guides and examples in the [full documentation](https://github.com/LIONant-depot/xdelegate/blob/main/documentation/documentation.md).
 
 ---
 
