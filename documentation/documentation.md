@@ -347,52 +347,63 @@ int main() {
 ## **Parent-to-Child Communication**
 A parent class notifies its children using a delegate.
 <br>
-**Description**: The `Parent` maintains a list of `Child` objects and registers their `OnMessage` methods with the delegate. When `SendMessage` is called, all children receive the message.
+**Description**: This example demonstrates how to use `xdelegate` within a C++ class hierarchy. The `Parent` class contains a delegate, and derived classes (`Child1` and `Child2`) 
+register their own event handlers with this delegate. The main function iterates through a vector of `Parent` pointers and calls `NotifyAll` on each delegate, triggering the registered callbacks.
 
 ```cpp
 #include "xdelegate.h"
 #include <iostream>
 #include <vector>
 
-class Child {
-public:
-    void OnMessage(const std::string& msg) {
-        std::cout << "Child " << id << " received: " << msg << "\n";
-    }
-    int id;
-};
-
+// Base class with an xdelegate
 class Parent {
 public:
-    xdelegate::thread_unsafe<const std::string&> delegate;
-    std::vector<Child> children;
+    xdelegate::thread_unsafe<int> delegate;
+};
 
-    void AddChild(Child child) {
-        children.push_back(child);
-        delegate.Register<&Child::OnMessage>(children.back());
+// Child class 1 inheriting from Parent
+class Child1 : public Parent {
+public:
+    Child1() {
+        delegate.Register<&Child1::HandleEvent>(*this);
     }
+    void HandleEvent(int value) {
+        std::cout << "Child1 received: " << value << "\n";
+    }
+};
 
-    void SendMessage(const std::string& msg) {
-        delegate.NotifyAll(msg);
+// Child class 2 inheriting from Parent
+class Child2 : public Parent {
+public:
+    Child2() {
+        delegate.Register<&Child2::HandleEvent>(*this);
+    }
+    void HandleEvent(int value) {
+        std::cout << "Child2 received: " << value << "\n";
     }
 };
 
 int main() {
-    Parent parent;
-    parent.AddChild(Child{1});
-    parent.AddChild(Child{2});
+    std::vector<Parent*> parents;
+    Child1 c1;
+    Child2 c2;
+    parents.push_back(&c1);
+    parents.push_back(&c2);
 
-    parent.SendMessage("Hello, children!");
-    // Output:
-    // Child 1 received: Hello, children!
-    // Child 2 received: Hello, children!
-
+    for (auto* parent : parents) {
+        parent->delegate.NotifyAll(100);
+    }
     return 0;
 }
 ```
 
 ## **Bidirectional Many-to-Many Communication**
 Subscribers can also send messages back to publishers using a second delegate.
+**Description**: This example demonstrates a flexible, many-to-many communication system using the xdelegate library, where publishers and subscribers exchange messages
+via an EventDispatcher without needing to know each other’s types. The EventDispatcher manages two delegates—one for publishers to notify subscribers 
+and another for subscribers to notify publishers—enabling loose coupling. This design enhances flexibility and maintainability by allowing
+components to be added or modified independently.
+
 
 ```cpp
 #include "xdelegate.h"
