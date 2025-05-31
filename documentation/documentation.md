@@ -22,6 +22,10 @@ The `xdelegate` namespace provides a lightweight and flexible delegate system in
    - [Multiple Callbacks with Mixed Types](#multiple-callbacks-with-mixed-types)
 7. [Best Practices](#best-practices)
 8. [Common Pitfalls](#common-pitfalls)
+9. [Extended Examples](#extended-examples)
+    1. [One-to-Many Communication](#one-to-many-communication)
+    2. [Parent-to-Child Communication](#parent-to-child-communication)
+    3. [Bidirectional Many-to-Many Communication](#bidirectional-many-to-many-communication)
 
 
 ## **Overview**
@@ -295,10 +299,12 @@ int main() {
 - **Signature Mismatch**: Ensure callback arguments match the delegate's template parameters.
 - **Blocking Callbacks**: Long-running callbacks in `thread_safe` can block other threads due to the mutex.
 
-# Going beyound the basics... Extended Examples
+# **Extended Examples**
 
-## 1. One-to-Many Communication (Publisher-Subscribers)
-A single publisher notifies multiple subscribers using the delegate system.
+Going beyound the basics...
+
+## **One-to-Many Communication**
+One-to-Many Communication (Publisher-Subscribers). A single publisher notifies multiple subscribers using the delegate system.
 
 ```cpp
 #include "xdelegate.h"
@@ -338,8 +344,10 @@ int main() {
 
 - **Description**: The `Publisher` uses a delegate to notify multiple `Subscriber` instances. Each subscriber registers its `OnEvent` method, and `NotifyAll` calls all registered callbacks.
 
-## 2. Parent-to-Child Communication
+## **Parent-to-Child Communication**
 A parent class notifies its children using a delegate.
+<br>
+**Description**: The `Parent` maintains a list of `Child` objects and registers their `OnMessage` methods with the delegate. When `SendMessage` is called, all children receive the message.
 
 ```cpp
 #include "xdelegate.h"
@@ -383,9 +391,7 @@ int main() {
 }
 ```
 
-- **Description**: The `Parent` maintains a list of `Child` objects and registers their `OnMessage` methods with the delegate. When `SendMessage` is called, all children receive the message.
-
-## 3. Bidirectional Many-to-Many Communication
+## **Bidirectional Many-to-Many Communication**
 Subscribers can also send messages back to publishers using a second delegate.
 
 ```cpp
