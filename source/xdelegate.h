@@ -52,6 +52,15 @@ namespace xdelegate
         }
 
         //--------------------------------------------------------------------------------------
+        // Addind this function to handle capture lambdas and callables
+
+        template< typename T_CLASS >
+        __inline void Register(T_CLASS& ClassInstance) noexcept
+        {
+            Register<&T_CLASS::operator()>(ClassInstance);
+        }
+
+        //--------------------------------------------------------------------------------------
         // Registers a free function or static member function callback.
         // @param pHandle is an optional pointer that later can be used to identify this entry for deletion
         // @param Template Parameter. The parameter could be a lambda or callable
@@ -59,7 +68,7 @@ namespace xdelegate
         template< auto T_CALLABLE_V >
         __inline void Register(void* pHandle = nullptr) noexcept
         {
-            static_assert(std::is_invocable_v<std::remove_pointer_t<decltype(T_CALLABLE_V)>>, "T_CALLABLE_V must be a callable (e.g., a lambda or a free function)");
+            static_assert(std::is_invocable_v<std::remove_pointer_t<decltype(T_CALLABLE_V)>, T_ARGS...>, "T_CALLABLE_V must be a callable (e.g., a lambda or a free function)");
             m_Delegates.push_back
             (
                 info
@@ -137,6 +146,13 @@ namespace xdelegate
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
             thread_unsafe<T_ARGS...>::Register<T_FUNCTION_PTR_V>(ClassInstance);
+        }
+
+        template< typename T_CLASS >
+        __inline void Register(T_CLASS& ClassInstance) noexcept
+        {
+            std::lock_guard<std::mutex> lock(m_Mutex);
+            thread_unsafe<T_ARGS...>::Register<&T_CLASS::operator()>(ClassInstance);
         }
 
         mutable std::mutex m_Mutex;

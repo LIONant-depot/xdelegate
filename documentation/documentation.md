@@ -10,7 +10,8 @@ The `xdelegate` namespace provides a lightweight and flexible delegate system in
    - [Creating a Delegate](#creating-a-delegate)
    - [Registering Callbacks](#registering-callbacks)
      - [Member Functions](#member-functions)
-     - [Free Functions and Lambdas](#free-functions-and-lambdas)
+     - [Free Functions and Captureless Lambdas](#free-functions-and-captureless-lambdas)
+     - [With Capture Lambdas](#with-capture-lambdas)
    - [Invoking Callbacks](#invoking-callbacks)
    - [Removing Callbacks](#removing-callbacks)
 5. [Thread Safety](#thread-safety)
@@ -97,7 +98,7 @@ Callbacks can be registered as member functions or free functions/lambdas.
 delegate.Register<&Class::MemberFunction>(instance);
 ```
 
-#### **Free Functions and Lambdas**
+#### **Free Functions and Captureless Lambdas**
 - Use the `Register` method with the callable as a template parameter.
 - Optionally provide a `void* pHandle` to identify the callback for removal.
 
@@ -105,6 +106,16 @@ delegate.Register<&Class::MemberFunction>(instance);
 ```cpp
 delegate.Register<&FreeFunction>(handle);  // Free function
 delegate.Register<[](T_ARGS... args) { /* logic */ }>();  // Lambda
+```
+
+#### **With Capture Lambdas**
+- Use the `Register` method with the callable Instance as the function parameter.
+- You can also use the instance of the callable to later own idetify for remobal.
+
+**Syntax**:
+```cpp
+auto MyCallback = [&](T_ARGS... args) { /* logic */ };
+delegate.Register(MyCallback);
 ```
 
 ### **Invoking Callbacks**
