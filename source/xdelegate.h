@@ -1,3 +1,7 @@
+#ifndef XDELEGATE_H
+#define XDELEGATE_H
+#pragma once
+
 #include <vector>
 #include <functional>
 #include <mutex>
@@ -158,3 +162,5 @@ namespace xdelegate
         mutable std::mutex m_Mutex;
     };
 }
+
+#endif
