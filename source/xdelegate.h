@@ -149,7 +149,7 @@ namespace xdelegate
         __inline void Register(T_CLASS& ClassInstance) noexcept
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
-            thread_unsafe<T_ARGS...>::Register<T_FUNCTION_PTR_V>(ClassInstance);
+            thread_unsafe<T_ARGS...>::template Register<T_FUNCTION_PTR_V>(ClassInstance);
         }
 
         template< typename T_CLASS >
